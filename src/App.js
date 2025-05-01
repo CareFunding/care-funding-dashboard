@@ -27,9 +27,10 @@ export default function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
+    return () => unsubscribe();
   }, []);
 
   const login = async () => {
