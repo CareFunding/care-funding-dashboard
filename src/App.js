@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import {
@@ -7,10 +6,6 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyD475y2fyqq2le-yZvdpCoiju2xpVyf6gQ",
@@ -24,11 +19,60 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// [Component content here — abbreviated for brevity]
-export default function UnderwritingDashboard() {
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+  }, []);
+
+  const login = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const logout = () => signOut(auth);
+
   return (
-    <div className="text-center text-white p-10">
-      <h1>Firebase Auth Protected Dashboard (Placeholder)</h1>
+    <div style={{ padding: 40, textAlign: 'center', fontFamily: 'Arial' }}>
+      <img src='/care-funding-logo.png' alt='Logo' height='80' />
+      <h1>Care Funding Group</h1>
+      <h2>The Funders That Care</h2>
+      {!user ? (
+        <div style={{ marginTop: 20 }}>
+          <input
+            type='email'
+            placeholder='Email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ padding: 10, margin: 5 }}
+          />
+          <br />
+          <input
+            type='password'
+            placeholder='Password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ padding: 10, margin: 5 }}
+          />
+          <br />
+          <button onClick={login} style={{ padding: '10px 20px', marginTop: 10 }}>
+            Login
+          </button>
+        </div>
+      ) : (
+        <div style={{ marginTop: 20 }}>
+          <h3>Welcome, {user.email}</h3>
+          <button onClick={logout} style={{ padding: '10px 20px' }}>Logout</button>
+        </div>
+      )}
     </div>
   );
 }
